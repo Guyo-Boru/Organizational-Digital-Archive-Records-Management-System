@@ -24,9 +24,13 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-# Keycloak realm is up and running (see docker-compose.yml) but the app isn't
-# validating tokens against it yet — that's Spring Security config, coming next.
-# Realm issuer will be: http://localhost:8081/realms/digital-archive
+  security:
+  oauth2:
+    resourceserver:
+      jwt:
+      #Spring auto-discovers the jwk set from
+      #{issuer-uri}/.well-known/openid-configuration
+        issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/digital-archive}
 
 server:
   port: ${SERVER_PORT:8080}
