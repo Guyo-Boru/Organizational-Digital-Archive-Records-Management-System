@@ -2,12 +2,11 @@ package com.guyo.archive_system.department.controller;
 
 import com.guyo.archive_system.department.dto.DepartmentDto;
 import com.guyo.archive_system.department.service.DepartmentService;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/departments")
@@ -19,7 +18,7 @@ public class DepartmentController {
     @GetMapping
     public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
         return ResponseEntity.ok(
-                departmentService.getAllDepartments()
+                departmentService.getAll()
         );
     }
 
@@ -28,7 +27,7 @@ public class DepartmentController {
             @PathVariable UUID departmentId
     ) {
         return ResponseEntity.ok(
-                departmentService.getDepartmentById(departmentId)
+                departmentService.getById(departmentId)
         );
     }
 }
