@@ -4,7 +4,8 @@ import com.digitalarchive.domain.entity.DocumentWorkflowHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface DocumentWorkflowHistoryRepository extends JpaRepository<DocumentWorkflowHistory, Long> {
-    List<DocumentWorkflowHistory> findByDocument_DocumentIdOrderByChangedAtDesc(Long documentId);
+public interface DocumentWorkflowHistoryRepository extends JpaRepository<DocumentWorkflowHistory, UUID> {
+    List<DocumentWorkflowHistory> findByDocument_DocumentIdOrderByChangedAtDesc(UUID documentId);
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "document_notes")
@@ -18,9 +19,9 @@ import java.time.OffsetDateTime;
 public class DocumentNote {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "note_id")
-    private Long noteId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "note_id", updatable = false, nullable = false)
+    private UUID noteId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "document_id", nullable = false)
@@ -34,9 +35,21 @@ public class DocumentNote {
     @Column(name = "note", nullable = false, columnDefinition = "text")
     private String note;
 
-    @Column(name = "created_by")
-    private String createdBy;
-
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    @Column(name = "created_by", nullable = false)
+    private UUID createdBy;
+
+    @Column(name = "updated_at", insertable = false, updatable = false)
+    private OffsetDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private UUID updatedBy;
+
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private UUID deletedBy;
 }

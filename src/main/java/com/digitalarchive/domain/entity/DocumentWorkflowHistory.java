@@ -7,8 +7,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
-/** Every workflow transition is written here — see slide 11. */
 @Entity
 @Table(name = "document_workflow_history")
 @Getter
@@ -19,9 +19,9 @@ import java.time.OffsetDateTime;
 public class DocumentWorkflowHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "workflow_id")
-    private Long workflowId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "workflow_id", updatable = false, nullable = false)
+    private UUID workflowId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "document_id", nullable = false)
@@ -37,13 +37,12 @@ public class DocumentWorkflowHistory {
     @Column(name = "to_status", nullable = false)
     private DocumentStatus toStatus;
 
-    @Column(name = "changed_by", nullable = false)
-    private String changedBy;
-
-    // Required on rejection per slide 7's workflow rules
     @Column(name = "comment", columnDefinition = "text")
     private String comment;
 
     @Column(name = "changed_at", insertable = false, updatable = false)
     private OffsetDateTime changedAt;
+
+    @Column(name = "changed_by", nullable = false)
+    private UUID changedBy;
 }

@@ -354,8 +354,7 @@ CREATE TABLE document_workflow_history (
 
 CREATE TABLE audit_logs (
 
-    audit_log_id UUID PRIMARY KEY
-        DEFAULT gen_random_uuid(),
+    audit_log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     actor_id UUID,
 

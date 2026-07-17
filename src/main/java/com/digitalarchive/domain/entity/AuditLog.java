@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "audit_logs")
@@ -19,12 +20,12 @@ import java.time.OffsetDateTime;
 public class AuditLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "audit_log_id")
-    private Long auditLogId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "audit_log_id", updatable = false, nullable = false)
+    private UUID auditLogId;
 
-    @Column(name = "actor_id", nullable = false)
-    private String actorId;
+    @Column(name = "actor_id")
+    private UUID actorId;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
@@ -37,13 +38,18 @@ public class AuditLog {
     private ResourceType resourceType;
 
     @Column(name = "resource_id")
-    private String resourceId;
+    private UUID resourceId;
 
-    @Column(name = "ip_address")
-    private String ipAddress;
-
-    @Column(name = "details", columnDefinition = "text")
+    // Maps Java String <-> Postgres JSONB column
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "details", columnDefinition = "jsonb")
     private String details;
+
+    // Postgres INET has no native Hibernate type; SqlTypes.OTHER matches
+    // how the Postgres JDBC driver reports it, so schema validation passes
+    @JdbcTypeCode(SqlTypes.OTHER)
+    @Column(name = "ip_address", columnDefinition = "inet")
+    private String ipAddress;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;

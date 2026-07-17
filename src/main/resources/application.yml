@@ -10,8 +10,6 @@ spring:
 
   jpa:
     hibernate:
-      # 'validate' on purpose: your schema is owned by Flyway (V1__init_schema.sql etc.),
-      # not by Hibernate. Hibernate should never auto-generate/alter tables here.
       ddl-auto: validate
     properties:
       hibernate:
@@ -25,21 +23,10 @@ spring:
     baseline-on-migrate: true
 
   security:
-  oauth2:
-    resourceserver:
-      jwt:
-      #Spring auto-discovers the jwk set from
-      #{issuer-uri}/.well-known/openid-configuration
-        issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/digital-archive}
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/digital-archive}
 
 server:
   port: ${SERVER_PORT:8080}
-
-logging:
-  level:
-    org.springframework.security: INFO
-    com.digitalarchive: DEBUG
-
-app:
-  file-storage:
-    location: ${FILE_STORAGE_LOCATION:./uploads}

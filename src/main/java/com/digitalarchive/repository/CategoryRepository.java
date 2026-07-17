@@ -3,5 +3,7 @@ package com.digitalarchive.repository;
 import com.digitalarchive.domain.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+import java.util.UUID;
+
+public interface CategoryRepository extends JpaRepository<Category, UUID> {
 }

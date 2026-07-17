@@ -8,14 +8,14 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface DocumentRepository extends JpaRepository<Document, Long> {
+public interface DocumentRepository extends JpaRepository<Document, UUID> {
 
     Optional<Document> findByReferenceNumber(String referenceNumber);
 
     List<Document> findByStatusAndDeletedAtIsNull(DocumentStatus status);
 
-    // Matches the tsvector full-text search setup from your migrations
     @Query(value = """
             SELECT * FROM documents d
             WHERE d.deleted_at IS NULL
