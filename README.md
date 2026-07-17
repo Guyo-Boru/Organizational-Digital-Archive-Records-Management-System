@@ -1,1191 +1,871 @@
 Organizational Digital Archive & Records Management System
 
-A secure web-based system for the centralized management, classification, storage, versioning, approval, retrieval, and auditing of official organizational documents and records.
+A secure, web-based digital archive and records management system designed to help organizations register, classify, store, manage, search, approve, track, and protect official documents.
 
-The system is designed to replace fragmented and inefficient document-handling processes with a structured digital archive that provides controlled access, document integrity, traceability, and efficient information retrieval.
+The system is being developed as a full-stack application with a Java/Spring Boot backend, React frontend, PostgreSQL database, Keycloak-based authentication and authorization, and containerized deployment support.
 
-Table of Contents
-1. Project Overview
-2. Problem Statement
-3. Project Objectives
-4. Project Scope
-5. Core Features
-6. System Architecture
-7. Technology Stack
-8. Domain Model
-9. Database Design
-10. Database Migration History
-11. Core Domain Entities
-12. Document Lifecycle
-13. Document Versioning and Integrity
-14. Workflow and Approval
-15. Audit Logging
-16. Security Architecture
-17. Backend Architecture
-18. Project Structure
-19. API Design
-20. Current Implementation Status
-21. Running the Application
-22. Database Configuration
-23. Flyway Database Migrations
-24. Development Workflow
-25. Git and GitHub Workflow
-26. Development Roadmap
-27. Project Design Principles
-28. Future Deployment
-29. License
-1. Project Overview
+📌 Project Overview
 
-The Organizational Digital Archive & Records Management System is a full-stack information system for managing official organizational documents throughout their lifecycle.
+Many organizations still rely on physical documents, scattered digital files, and inefficient manual processes to manage official records.
 
-The system provides a centralized platform where authorized users can:
+This project provides a centralized digital archive where authorized users can:
 
 Register official documents
-Classify documents
+Upload and manage digital document files
 Organize documents by department and category
-Store document files and metadata
-Maintain document versions
-Submit documents for review and approval
-Track document workflow history
+Apply document classification levels
+Search and retrieve documents
+Manage document versions
+Track document workflow and status changes
 Add notes to documents
-Search and retrieve records
-Monitor system activities through audit logs
-Protect document integrity using SHA-256 checksums
-Access system functionality according to assigned roles
+Maintain an audit trail of important system activities
+Control access using role-based authorization
+Preserve document integrity using file checksums
 
-The system is being developed as a modular monolithic application with a Spring Boot backend, React frontend, PostgreSQL database, Flyway migration management, and Keycloak-based identity and role management.
+The system is designed around the principle of secure, traceable, and structured document management.
 
-2. Problem Statement
+🎯 Project Objectives
 
-Organizations commonly manage official records using a combination of:
+The main objectives of the system are to:
 
-Paper-based documents
-Unstructured digital folders
-Email attachments
-Local computer storage
-Shared drives without sufficient access control
-
-These approaches create several problems:
-
-Difficulty locating documents
-Duplicate files
-Loss of document history
-Unauthorized access
-Lack of centralized storage
-Weak accountability
-No reliable approval history
-Difficulty determining which version is current
-Limited auditability
-
-This project addresses these problems by providing a centralized and structured digital archive system.
-
-3. Project Objectives
-General Objective
-
-To design and develop a secure digital archive and records management system for the centralized storage, organization, retrieval, versioning, workflow management, and auditing of organizational documents.
-
-Specific Objectives
-
-The system aims to:
-
-Centralize organizational document storage.
-Organize documents by departments and categories.
-Support document classification based on sensitivity.
+Digitize organizational document archiving.
+Centralize official records in a structured system.
+Improve document search and retrieval.
 Maintain document version history.
-Provide document approval and workflow tracking.
-Enable efficient document search and retrieval.
-Maintain an audit trail of important system actions.
-Protect document integrity through SHA-256 checksums.
-Provide controlled access through authentication and role-based authorization.
-Reduce reliance on fragmented and manual record-management processes.
-4. Project Scope
-Included in Scope
+Support document approval workflows.
+Enforce secure access to sensitive documents.
+Track important activities through audit logs.
+Maintain document integrity through checksum verification.
+Provide a maintainable and scalable full-stack architecture.
+Provide a foundation for future deployment in real organizational environments.
+🏗️ System Architecture
 
-The system includes:
-
-Department management
-Category management
-User identity mapping
-Document registration
-Document metadata management
-Document classification
-Document status management
-Document versioning
-File upload and storage
-SHA-256 checksum generation
-Document notes
-Document approval workflow
-Workflow history
-Search and filtering
-Audit logging
-Dashboard statistics
-Authentication
-Role-based access control
-REST API
-React frontend
-PostgreSQL database
-Flyway database migrations
-Docker-based deployment preparation
-Deliberately Excluded
-
-To maintain a realistic development scope, the project does not use:
-
-Microservices
-Redis
-RabbitMQ
-Complex event-driven infrastructure
-Unnecessary distributed systems
-Multiple independent backend services
-
-The project follows a modular monolithic architecture because it provides sufficient scalability and maintainability for the system's scope without introducing unnecessary operational complexity.
-
-5. Core Features
-5.1 Department Management
-
-Departments represent organizational units responsible for documents.
-
-The system supports:
-
-Viewing all departments
-Retrieving a department by UUID
-Associating users with departments
-Associating documents with organizational ownership where applicable
-5.2 Category Management
-
-Categories provide an organizational classification for documents.
-
-Examples may include:
-
-Administrative
-Financial
-Human Resources
-Legal
-Technical
-Reports
-
-The actual categories are managed through the database seed data and can be expanded according to organizational requirements.
-
-5.3 Document Management
-
-The document module manages the primary record of an official document.
-
-Document metadata may include:
-
-Document title
-Description
-Department
-Category
-Classification level
-Current status
-Owner or creator
-Creation date
-Last modification date
-Current version
-
-The document record is separate from the physical file version.
-
-This distinction allows one document to have multiple versions over time.
-
-5.4 Document Version Management
-
-Each uploaded file version is recorded separately.
-
-A document may have:
-
-Document
-    │
-    ├── Version 1
-    ├── Version 2
-    └── Version 3
-
-The system maintains version history instead of replacing the previous file without traceability.
-
-5.5 Document Classification
-
-Documents can be assigned classification levels according to their sensitivity.
-
-The classification system is represented by the database enum:
-
-classification_level
-
-This supports controlled handling of sensitive organizational records.
-
-5.6 Document Notes
-
-Authorized users can add notes associated with documents.
-
-Notes may be used for:
-
-Review comments
-Internal remarks
-Clarifications
-Approval-related observations
-
-The type of note is controlled using:
-
-note_type
-5.7 Document Workflow
-
-Documents may pass through different workflow states.
-
-A typical workflow may be:
-
-Draft
-  ↓
-Submitted
-  ↓
-Under Review
-  ↓
-Approved
-
-or:
-
-Submitted
-    ↓
-Rejected
-    ↓
-Returned for Revision
-    ↓
-Resubmitted
-
-Each important workflow transition is recorded in the workflow history.
-
-5.8 Search and Retrieval
-
-The system is designed to allow users to locate documents using criteria such as:
-
-Title
-Category
-Department
-Classification level
-Status
-Date
-Document owner
-
-Search and filtering are important because the primary purpose of a digital archive is not merely to store files, but to make them retrievable.
-
-5.9 Audit Logging
-
-Important system activities are recorded in the audit log.
-
-Examples include:
-
-Document creation
-Document update
-Document deletion
-Document viewing
-File upload
-Version creation
-Workflow transition
-Approval
-Rejection
-
-The audit system uses:
-
-audit_action
-resource_type
-
-to describe activities and affected resources.
-
-6. System Architecture
-
-The system uses a modular monolithic architecture.
+The application follows a layered architecture:
 
 ┌──────────────────────────────┐
-│        React Frontend        │
-│                              │
-│  Dashboard                   │
-│  Documents                   │
-│  Search                      │
-│  Administration              │
+│          React Frontend      │
+│       User Interface         │
 └──────────────┬───────────────┘
                │
                │ REST API
                ▼
 ┌──────────────────────────────┐
-│     Spring Boot Backend      │
+│       Spring Boot Backend    │
 │                              │
-│  Department Module           │
-│  Category Module             │
-│  Document Module             │
-│  Version Module              │
-│  Workflow Module             │
-│  Audit Module                │
-│                              │
-│  Business Logic              │
-│  DTOs                        │
-│  Mappers                     │
+│  Controllers                 │
+│       ↓                      │
+│  Services                    │
+│       ↓                      │
 │  Repositories                │
+│       ↓                      │
+│  JPA Entities                │
 └──────────────┬───────────────┘
                │
                ▼
 ┌──────────────────────────────┐
-│       PostgreSQL 18          │
+│       PostgreSQL Database    │
 │                              │
-│  Database Schema             │
-│  V1 – V6 Migrations          │
-│  Indexes                     │
-│  Views                       │
+│  Documents                   │
+│  Versions                    │
+│  Departments                 │
+│  Categories                  │
+│  Workflow History            │
+│  Audit Logs                  │
 └──────────────────────────────┘
 
-Authentication and role management are handled through Keycloak.
-
-7. Technology Stack
+          Authentication
+               ▲
+               │
+        ┌──────┴──────┐
+        │  Keycloak   │
+        │             │
+        │ Users       │
+        │ Roles       │
+        │ Tokens      │
+        └─────────────┘
+🧱 Technology Stack
 Backend
-Technology	Version / Status
+Technology	Version / Role
 Java	25.0.3
 Spring Boot	4.1.0
-Spring Web MVC	Spring Boot managed
-Spring Data JPA	Spring Boot managed
+Spring Framework	7.0.8
+Spring Data JPA	Database persistence
 Hibernate ORM	7.4.1.Final
-Maven	3.9.x
-Lombok	Configured
-MapStruct	Configured
+Maven	Build and dependency management
+Lombok	Boilerplate reduction
+MapStruct	DTO/entity mapping
+Flyway	Database migration management
+HikariCP	JDBC connection pooling
+Apache Tomcat	11.0.22
 Database
-Technology	Version / Status
+Technology	Version / Role
 PostgreSQL	18.4
-PostgreSQL JDBC Driver	Configured
-Flyway	Configured
-pgcrypto	Used by database schema
+PostgreSQL JDBC Driver	42.7.11
+PostgreSQL pgcrypto	UUID and cryptographic functions
 Frontend
-Technology	Status
-React	Planned / frontend development
-JavaScript	Planned / frontend development
-Vite	Frontend development
+Technology	Role
+React	User interface
+JavaScript	Frontend programming language
+Vite	Frontend build tool
+HTML5	Structure
+CSS3	Styling
 Security
-Technology	Purpose
-Keycloak	Authentication and identity
-OAuth 2.0	Authorization framework
-OpenID Connect	Identity protocol
-RBAC	Role-based access control
-Development Tools
-Visual Studio Code
-Git
-GitHub
-Postman
-PostgreSQL tools
-8. Domain Model
+Technology	Role
+Keycloak	Identity and access management
+OAuth 2.0 / OpenID Connect	Authentication protocol
+JWT	Secure token-based communication
+Role-Based Access Control	Authorization
+Development and Deployment
+Technology	Role
+Git	Version control
+GitHub	Remote repository
+Docker	Containerization
+Postman	API testing
+VS Code	Primary development environment
+📂 Project Structure
 
-The core domain is built around organizational records and their lifecycle.
+The project is organized as a modular monolithic application.
 
-Department
-     │
-     └── Users
+archive-system/
+│
+├── backend/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/guyo/archive_system/
+│   │   │   │       │
+│   │   │   │       ├── ArchiveSystemApplication.java
+│   │   │   │       │
+│   │   │   │       ├── department/
+│   │   │   │       │   ├── controller/
+│   │   │   │       │   ├── dto/
+│   │   │   │       │   ├── entity/
+│   │   │   │       │   ├── mapper/
+│   │   │   │       │   ├── repository/
+│   │   │   │       │   └── service/
+│   │   │   │       │
+│   │   │   │       ├── category/
+│   │   │   │       │
+│   │   │   │       ├── document/
+│   │   │   │       │
+│   │   │   │       ├── documentversion/
+│   │   │   │       │
+│   │   │   │       ├── documentnote/
+│   │   │   │       │
+│   │   │   │       ├── workflow/
+│   │   │   │       │
+│   │   │   │       ├── audit/
+│   │   │   │       │
+│   │   │   │       ├── user/
+│   │   │   │       │
+│   │   │   │       └── common/
+│   │   │   │
+│   │   │   └── resources/
+│   │   │       ├── application.yml
+│   │   │       │
+│   │   │       └── db/
+│   │   │           └── migration/
+│   │   │               ├── V1__init_schema.sql
+│   │   │               ├── V2__seed_data.sql
+│   │   │               ├── V3__create_indexes.sql
+│   │   │               ├── V4__create_views.sql
+│   │   │               ├── V5__...
+│   │   │               └── V6__...
+│   │   │
+│   │   └── test/
+│   │
+│   └── pom.xml
+│
+├── frontend/
+│   └── React application
+│
+├── docs/
+│   ├── architecture/
+│   ├── database/
+│   ├── api/
+│   └── deployment/
+│
+├── docker-compose.yml
+├── README.md
+└── .gitignore
 
-Category
-     │
-     └── Documents
+The exact folder structure may evolve as implementation progresses, but the architectural boundaries should remain consistent.
 
-User
-     │
-     ├── Documents
-     ├── Document Versions
-     ├── Notes
-     ├── Workflow History
-     └── Audit Logs
+🗄️ Database Design
 
-Document
-     │
-     ├── Document Versions
-     ├── Document Notes
-     └── Workflow History
+The database is managed using Flyway migrations.
 
-The database is the authoritative source for the relationships.
+The current schema has successfully reached:
 
-The backend entities must remain consistent with the established V1–V6 schema.
-
-9. Database Design
-
-The database is PostgreSQL-based and managed using Flyway.
-
-The core database tables are:
-
-departments
-categories
-users
-documents
-document_versions
-document_notes
-document_workflow_history
-audit_logs
-
-The database also contains:
-
-Foreign-key relationships
-Unique constraints
-Check constraints
-PostgreSQL enum types
-Indexes
-Database views
-UUID identifiers
-SHA-256 checksum storage
-Database Enums
-
-The system uses controlled database values through PostgreSQL enum types.
-
-document_status
-classification_level
-note_type
-audit_action
-resource_type
-
-Using controlled enum values prevents inconsistent data such as:
-
-approved
-Approved
-APPROVED
-approve
-
-from being stored as separate values.
-
-10. Database Migration History
-
-Flyway manages the database schema using versioned migrations.
-
-V1 ──► V2 ──► V3 ──► V4 ──► V5 ──► V6
-V1 — Initial Schema
-
-Creates the core database foundation, including:
-
-PostgreSQL extensions
-Enum types
-Departments
-Categories
-Users
-Documents
-Document versions
-Notes
-Workflow history
-Audit logs
-Foreign-key relationships
-V2 — Seed Data
-
-Provides initial reference data, including:
-
-Departments
-Categories
-
-This allows the application to operate with initial master data.
-
-V3 — Indexes
-
-Creates indexes to improve query performance.
-
-Indexes are especially important for:
-
-Document searching
-Foreign-key lookups
-Status filtering
-Date filtering
-Audit history retrieval
-V4 — Database Views
-
-Creates database views for commonly required read operations.
-
-The project includes views such as:
-
-vw_document_details
-vw_document_statistics
-vw_recent_documents
-vw_audit_history
-
-Views simplify frequently used queries and provide structured read models.
-
-V5 — Schema Enhancement
-
-Contains subsequent database improvements that extend or refine the initial database foundation.
-
-V6 — Current Schema Version
-
-Contains the latest database changes currently applied to the project.
-
-Current database status:
-
-Database: archive_db
-PostgreSQL: 18.4
-Current schema version: 6
-Validated migrations: 6
+Flyway Schema Version: 6
+Database: PostgreSQL 18.4
+Schema: public
 Status: Up to date
-11. Core Domain Entities
+
+The application validates and executes database migrations automatically during startup.
+
+Current startup confirmation:
+
+Successfully validated 6 migrations
+Current version of schema "public": 6
+Schema "public" is up to date
+No migration necessary
+🧩 Core Domain Entities
+
+The database is designed around the following core entities.
+
+1. Departments
+
+Represents organizational departments or units.
+
+Example:
+
+Human Resources
+Finance
+Information Technology
+Administration
+
+A department may be associated with multiple users and documents.
+
+2. Categories
+
+Provides structured classification of documents.
+
+Examples:
+
+Policies
+Reports
+Contracts
+Financial Documents
+Administrative Documents
+Technical Documents
+
+A category may contain multiple documents.
+
+3. Users
+
+The system stores user references associated with the identity management system.
+
+The application does not duplicate authentication responsibilities.
+
+Instead:
+
+Keycloak
+   │
+   ├── User Identity
+   ├── Password Management
+   ├── Roles
+   └── Access Tokens
+          │
+          ▼
+Spring Boot Application
+          │
+          ▼
+PostgreSQL
+
+The database stores the user's Keycloak identifier (user_sub) where necessary for relationships and audit tracking.
+
+4. Documents
+
+The central entity of the system.
+
+A document contains information such as:
+
+Title
+Description
+Document number
 Department
-
-Represents an organizational department.
-
-Responsibilities:
-
-Identify organizational units
-Group users
-Support organizational document management
 Category
+Classification level
+Current status
+Creator
+Current version
+Timestamps
 
-Represents a classification category for documents.
+A document represents the logical record, while the actual file versions are managed separately.
 
-Responsibilities:
-
-Organize documents
-Support filtering
-Improve document retrieval
-User
-
-Represents an application user identity.
-
-The system stores the user's Keycloak identity reference rather than implementing a separate authentication system inside the application database.
-
-This keeps identity management centralized.
-
-Document
-
-Represents the logical official record.
-
-A document is not simply a file.
-
-It contains the business identity and metadata of the record.
+5. Document Versions
 
 A document may have multiple versions.
 
-Document Version
+Example:
 
-Represents a specific uploaded version of a document.
+Document
+   │
+   ├── Version 1
+   ├── Version 2
+   └── Version 3 ← Current Version
 
-Each version can contain:
+Each version may contain:
 
-File information
 Version number
+File name
+File type
 File size
-MIME type
-Storage information
+Storage path
 SHA-256 checksum
-Uploading user
-Timestamp
-Document Note
+Uploaded by
+Upload timestamp
 
-Represents comments or notes associated with a document.
+This allows the system to preserve historical versions rather than overwriting files.
 
-Document Workflow History
+6. Document Notes
 
-Records the progression of a document through workflow states.
+Allows authorized users to add notes associated with documents.
+
+Possible note types include:
+
+COMMENT
+REVIEW
+REJECTION_REASON
+APPROVAL_NOTE
+GENERAL
+
+Notes provide contextual information without modifying the original document.
+
+7. Document Workflow History
+
+Records changes in a document's workflow.
 
 Example:
 
 DRAFT
-  ↓
+   ↓
 SUBMITTED
-  ↓
+   ↓
 UNDER_REVIEW
-  ↓
+   ↓
 APPROVED
 
-Each transition can record:
+Or:
 
-Previous state
-New state
+UNDER_REVIEW
+   ↓
+REJECTED
+   ↓
+DRAFT
+
+Each transition can be tracked with:
+
+Previous status
+New status
 User responsible
-Comment or reason
 Timestamp
-Audit Log
-
-Records important activities performed within the system.
-
-An audit record should answer:
-
-Who?
-Did what?
-To which resource?
-When?
-12. Document Lifecycle
-
-The document lifecycle follows this general process:
-
-Create Document
-       │
-       ▼
-Add Metadata
-       │
-       ▼
-Upload File
-       │
-       ▼
-Create Version
-       │
-       ▼
-Calculate SHA-256
-       │
-       ▼
-Submit for Review
-       │
-       ▼
-Review
-       │
- ┌─────┴─────┐
- ▼           ▼
-Approve     Reject
- │           │
- ▼           ▼
-Archive     Revise
-
-The exact workflow is controlled by the document status and workflow history.
-
-13. Document Versioning and Integrity
-
-The system does not overwrite previous document versions.
-
-Instead:
-
-Document
-    │
-    ├── Version 1
-    ├── Version 2
-    └── Version 3
-
-The current version is identified through the document's current version reference.
-
-SHA-256 Integrity Verification
-
-A SHA-256 checksum is generated for each file version.
-
-Conceptually:
-
-File
-  ↓
-SHA-256 Algorithm
-  ↓
-64-character hexadecimal checksum
-
-Example:
-
-a3f5...64-character-hash
-
-If the file changes, its checksum changes.
-
-This allows the system to detect whether a file has been modified.
-
-The checksum is stored in:
-
-checksum_sha256
-14. Workflow and Approval
-
-The workflow system tracks important state transitions.
-
-Example:
-
-Draft
-  ↓
-Submitted
-  ↓
-Under Review
-  ↓
-Approved
-
-Rejected documents may follow:
-
-Under Review
-      ↓
-Rejected
-      ↓
-Returned for Revision
-      ↓
-Resubmitted
-
-Workflow history preserves the sequence of decisions.
-
-This is important because the system should not only show the current state of a document.
-
-It should also explain how the document reached that state.
-
-15. Audit Logging
+Optional explanation
+8. Audit Logs
 
 Audit logs provide accountability.
 
-The system should be able to answer:
+The system can record actions such as:
 
-Who uploaded a document?
-Who changed its metadata?
-Who approved it?
-Who rejected it?
-Who created a new version?
-Who accessed or modified a resource?
+CREATE
+VIEW
+UPDATE
+DELETE
+DOWNLOAD
+UPLOAD
+APPROVE
+REJECT
+LOGIN
+LOGOUT
 
-The audit system records:
+The purpose is to answer:
 
-Actor
-Action
-Resource
-Resource ID
-Timestamp
-Details
-16. Security Architecture
+Who did what, to which resource, and when?
 
-Keycloak is responsible for:
+This is especially important for official organizational records.
 
-User authentication
-Identity management
-Role management
-Token issuance
+🔐 Security Model
 
-The Spring Boot application is responsible for:
+Authentication and authorization are handled through Keycloak.
 
-Validating authenticated requests
-Applying business rules
-Enforcing application-level access requirements
-Processing authorized operations
+The application is designed to avoid implementing its own password and user authentication system.
 
-Architecture:
+The security flow is:
 
 User
  │
  ▼
-Keycloak
+Keycloak Login
  │
- ├── Authentication
- ├── Identity
- └── Roles
-       │
-       ▼
-Spring Boot API
-       │
-       ├── Business Rules
-       ├── Document Operations
-       └── Data Access
+ ▼
+Access Token / JWT
+ │
+ ▼
+React Frontend
+ │
+ ▼
+Spring Boot REST API
+ │
+ ▼
+Token Validation
+ │
+ ▼
+Role-Based Authorization
 
-The application database stores the relationship between application records and Keycloak users using the user's Keycloak identity reference.
+Example roles may include:
 
-17. Backend Architecture
+ADMIN
+ARCHIVIST
+REVIEWER
+DEPARTMENT_USER
 
-Each feature follows a layered modular structure:
+The exact role model will be finalized according to the system's functional requirements.
 
-Controller
-    ↓
-Service Interface
-    ↓
-Service Implementation
-    ↓
-Repository
-    ↓
-Entity
-    ↓
-Database
+📄 Document Classification
 
-DTOs and mappers separate API models from database entities.
+Documents may be assigned classification levels.
+
+The current design supports classification concepts such as:
+
+PUBLIC
+INTERNAL
+CONFIDENTIAL
+RESTRICTED
+
+Classification is separate from authentication.
+
+For example:
+
+Authentication:
+    Who are you?
+
+Authorization:
+    What are you allowed to do?
+
+Classification:
+    How sensitive is this document?
+
+The system combines these concepts to control document access appropriately.
+
+🔄 Document Workflow
+
+The document lifecycle is designed around controlled status transitions.
 
 Example:
 
-HTTP Request
-     ↓
-Controller
-     ↓
-DTO
-     ↓
+┌────────┐
+│ DRAFT  │
+└───┬────┘
+    │
+    ▼
+┌───────────┐
+│ SUBMITTED │
+└─────┬─────┘
+      │
+      ▼
+┌──────────────┐
+│ UNDER_REVIEW │
+└──────┬───────┘
+       │
+   ┌───┴────┐
+   ▼        ▼
+APPROVED  REJECTED
+             │
+             ▼
+          DRAFT
+
+The workflow history records each transition.
+
+🔢 Document Versioning
+
+The system uses version-based document management.
+
+Example:
+
+Annual Report
+│
+├── v1.0
+├── v2.0
+└── v3.0 ← Current
+
+Previous versions remain available according to authorization rules.
+
+Each version has a SHA-256 checksum.
+
+File
+ │
+ ▼
+SHA-256 Hash
+ │
+ ▼
+Stored Checksum
+
+This allows the system to detect whether a file has been altered.
+
+🔍 Search and Retrieval
+
+The system will support document retrieval based on relevant metadata.
+
+Possible search parameters include:
+
+Document title
+Document number
+Category
+Department
+Status
+Classification level
+Creation date
+Upload date
+Creator
+Current version
+
+The search layer will be implemented progressively without introducing unnecessary infrastructure.
+
+The project deliberately avoids adding unnecessary technologies such as:
+
+Redis
+RabbitMQ
+Microservices
+
+The current scope is a modular monolith, which is more appropriate for the project timeline and requirements.
+
+🧬 Database Migration Strategy
+
+Database changes are managed using Flyway.
+
+Example:
+
+V1__init_schema.sql
+V2__seed_data.sql
+V3__create_indexes.sql
+V4__create_views.sql
+V5__additional_changes.sql
+V6__additional_changes.sql
+
+The rule is:
+
+Once a migration has been applied to a shared environment, it should not be casually edited.
+
+Instead, new changes should be introduced through a new migration.
+
+Example:
+
+Incorrect:
+Edit V3 after it has already been executed.
+
+Correct:
+Create V7__add_new_feature.sql
+
+This maintains database history and reproducibility.
+
+🧪 Testing Strategy
+
+Testing will be introduced progressively.
+
+The system will eventually include:
+
+Unit Tests
+
+Testing individual services and business logic.
+
 Service
-     ↓
-Mapper
-     ↓
-Entity
-     ↓
+   ↓
+Unit Test
+Repository Tests
+
+Testing database interaction.
+
 Repository
-     ↓
+   ↓
 PostgreSQL
-18. Project Structure
+Integration Tests
 
-Current backend structure:
+Testing multiple application layers together.
 
-archive-system/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/guyo/archive_system/
-│   │   │       │
-│   │   │       ├── department/
-│   │   │       │   ├── controller/
-│   │   │       │   │   └── DepartmentController.java
-│   │   │       │   │
-│   │   │       │   ├── dto/
-│   │   │       │   │   └── DepartmentDto.java
-│   │   │       │   │
-│   │   │       │   ├── entity/
-│   │   │       │   │   └── Department.java
-│   │   │       │   │
-│   │   │       │   ├── mapper/
-│   │   │       │   │   └── DepartmentMapper.java
-│   │   │       │   │
-│   │   │       │   ├── repository/
-│   │   │       │   │   └── DepartmentRepository.java
-│   │   │       │   │
-│   │   │       │   └── service/
-│   │   │       │       ├── DepartmentService.java
-│   │   │       │       └── DepartmentServiceImpl.java
-│   │   │       │
-│   │   │       └── ArchiveSystemApplication.java
-│   │   │
-│   │   └── resources/
-│   │       ├── db/
-│   │       │   └── migration/
-│   │       │       ├── V1__init_schema.sql
-│   │       │       ├── V2__seed_data.sql
-│   │       │       ├── V3__create_indexes.sql
-│   │       │       ├── V4__create_views.sql
-│   │       │       ├── V5__...
-│   │       │       └── V6__...
-│   │       │
-│   │       └── application.yml
-│   │
-│   └── test/
-│
-├── pom.xml
-├── README.md
-└── .gitignore
-
-As development continues, additional modules will follow the same structure:
-
-category/
-document/
-documentversion/
-workflow/
-audit/
-19. API Design
-
-The backend exposes RESTful APIs.
-
-Current implemented endpoints include:
-
-GET /api/departments
-
-Returns all departments.
-
-GET /api/departments/{departmentId}
-
-Returns a department by UUID.
-
-Future modules will follow the same REST conventions.
-
-Example planned API structure:
-
-/api/departments
-/api/categories
-/api/documents
-/api/documents/{id}/versions
-/api/documents/{id}/notes
-/api/documents/{id}/workflow
-/api/audit-logs
-
-Endpoints are only marked as implemented after the functionality has actually been developed and tested.
-
-20. Current Implementation Status
-Completed
-[✓] Project initialized
-[✓] Spring Boot backend configured
-[✓] Maven build configured
-[✓] PostgreSQL connected
-[✓] Flyway configured
-[✓] V1 migration completed
-[✓] V2 migration completed
-[✓] V3 migration completed
-[✓] V4 migration completed
-[✓] V5 migration completed
-[✓] V6 migration completed
-[✓] Database schema validated
-[✓] PostgreSQL 18.4 connected
-[✓] Department entity implemented
-[✓] Department DTO implemented
-[✓] Department repository implemented
-[✓] Department mapper implemented
-[✓] Department service interface implemented
-[✓] Department service implementation implemented
-[✓] Department controller implemented
-[✓] Department API implemented
-[✓] Application successfully starts
-[✓] Git repository initialized
-[✓] GitHub repository connected
-In Progress
-[ ] Department API testing
-[ ] Category module
-[ ] Continued backend module development
-Planned
-[ ] Keycloak integration
-[ ] User identity integration
-[ ] Document module
-[ ] Document version module
-[ ] File storage
-[ ] SHA-256 file integrity
-[ ] Document notes
-[ ] Workflow module
-[ ] Audit module
-[ ] Search and filtering
-[ ] Dashboard statistics
-[ ] React frontend
-[ ] Docker configuration
-[ ] Deployment
-21. Running the Application
-Prerequisites
-
-Install:
-
-Java 25
-Maven
-PostgreSQL 18
-Git
+Controller
+   ↓
+Service
+   ↓
+Repository
+   ↓
 Database
+API Testing
 
-Create the database:
+Using Postman during development.
 
-archive_db
+🛠️ Development Workflow
 
-Configure the database connection in:
+The development process follows:
 
-src/main/resources/application.yml
-Run the Application
+1. Define database/domain requirement
+          ↓
+2. Verify against V1–V6 schema
+          ↓
+3. Create Entity
+          ↓
+4. Create Repository
+          ↓
+5. Create DTO
+          ↓
+6. Create Mapper
+          ↓
+7. Create Service Interface
+          ↓
+8. Create Service Implementation
+          ↓
+9. Create Controller
+          ↓
+10. Test
+          ↓
+11. Commit to Git
 
-From the project root:
+This workflow ensures that implementation follows the database and domain design rather than randomly creating disconnected code.
 
-mvn spring-boot:run
+🌿 Git Workflow
 
-For a clean build:
+The project uses Git for version control.
+
+Current primary branch:
+
+main
+
+Development changes should be committed in logical units.
+
+Example:
+
+git status
+git add .
+git commit -m "Implement department service layer"
+git push origin main
+
+Recommended commit style:
+
+feat: add department service
+feat: add document repository
+fix: correct department mapping
+refactor: improve document service
+docs: update README
+test: add department service tests
+
+The repository should maintain a clean working tree after completed development milestones.
+
+🚀 Running the Backend
+
+From the backend project directory:
 
 mvn clean spring-boot:run
 
-The backend runs at:
+The application starts on:
 
 http://localhost:8080
-22. Database Configuration
 
-The application connects to:
+The application requires PostgreSQL to be available.
 
-jdbc:postgresql://localhost:5432/archive_db
+Current database configuration:
 
-The application uses:
-
-Database: PostgreSQL
 Database: archive_db
-Schema: public
+Host: localhost
+Port: 5432
+Database Engine: PostgreSQL 18.4
+🗃️ Flyway Startup Validation
 
-The database connection is managed by Spring Boot and HikariCP.
-
-23. Flyway Database Migrations
-
-Flyway automatically manages schema changes.
-
-On application startup:
-
-Application
-    ↓
-Connect to Database
-    ↓
-Flyway Validation
-    ↓
-Check Migration History
-    ↓
-Apply New Migrations
-    ↓
-Start Application
-
-Example startup confirmation:
+On successful startup, the application should confirm:
 
 Successfully validated 6 migrations
 Current version of schema "public": 6
 Schema "public" is up to date
 
-Migration files are stored in:
+If the database is not at the expected version, Flyway applies pending migrations automatically.
 
-src/main/resources/db/migration/
+📡 API Development
 
-Once a migration has been applied to a shared database, it should not be casually edited.
+The backend exposes REST APIs organized around domain resources.
 
-New schema changes should normally be added as a new migration.
+Example endpoint structure:
 
-24. Development Workflow
+/api/v1/departments
+/api/v1/categories
+/api/v1/documents
+/api/v1/document-versions
+/api/v1/workflows
+/api/v1/audit-logs
 
-The project follows a domain-driven implementation process.
+The API design will follow REST principles and use DTOs rather than exposing database entities directly.
 
-Understand Database Design
-          ↓
-Define Domain Requirement
-          ↓
-Create Entity
-          ↓
-Create DTO
-          ↓
-Create Repository
-          ↓
-Create Mapper
-          ↓
-Create Service Interface
-          ↓
-Create Service Implementation
-          ↓
-Create Controller
-          ↓
-Run Application
-          ↓
-Test API
-          ↓
-Commit Changes
-          ↓
-Push to GitHub
-25. Git and GitHub Workflow
+📦 DTO Architecture
 
-Git is used for version control.
+The application separates:
 
-Before working:
+Database Entity
+       │
+       ▼
+    Mapper
+       │
+       ▼
+      DTO
+       │
+       ▼
+   REST API
 
-git status
+Example:
 
-After implementing a feature:
+Department Entity
+        ↓
+DepartmentMapper
+        ↓
+DepartmentDto
+        ↓
+DepartmentController
 
-git add .
+This prevents the API layer from being tightly coupled to the persistence layer.
 
-Create a meaningful commit:
+🧠 Architectural Principles
 
-git commit -m "Implement department module"
+The project follows these principles:
 
-Push to GitHub:
+Separation of Concerns
 
-git push origin main
+Each layer has a clear responsibility.
 
-Recommended development cycle:
+Controller
+    ↓
+Service
+    ↓
+Repository
+    ↓
+Database
+DTO-Based API Design
 
-Implement
-   ↓
-Run
-   ↓
-Test
-   ↓
-Review
-   ↓
-Commit
-   ↓
-Push
+Database entities should not be directly exposed as API responses.
 
-The project should be pushed regularly instead of waiting until the end of development.
+Single Responsibility
 
-26. Development Roadmap
+Each class should have one primary responsibility.
+
+Database-First Consistency
+
+The Java domain model must remain consistent with the existing database schema.
+
+Controlled Scope
+
+The project avoids unnecessary complexity.
+
+The current architecture intentionally does not introduce:
+
+❌ Microservices
+❌ Redis
+❌ RabbitMQ
+❌ Unnecessary distributed systems
+
+The objective is to build a complete, secure, maintainable system within the project scope.
+
+🗺️ Development Roadmap
 Phase 1 — Foundation
 Project setup
 Spring Boot configuration
-PostgreSQL connection
+PostgreSQL configuration
 Flyway integration
-V1–V6 database schema
-GitHub repository
-Phase 2 — Master Data
+V1–V6 migrations
+Basic application startup
+Phase 2 — Core Domain
 Department module
 Category module
-Phase 3 — Identity and Security
-Keycloak setup
-User identity integration
-Authentication
-Role-based authorization
-Phase 4 — Document Management
-Document entity
+User references
+DTOs
+Mappers
+Repositories
+Services
+Controllers
+Phase 3 — Document Management
+Document creation
 Document metadata
-Classification
-Status management
-Document APIs
-Phase 5 — File and Version Management
-File upload
-File storage
-Document version creation
-SHA-256 checksum generation
-Current-version tracking
-Phase 6 — Workflow
-Document submission
+Document upload
+Document retrieval
+Document versions
+SHA-256 checksum handling
+Phase 4 — Workflow
+Document status management
+Submission
 Review
 Approval
 Rejection
 Workflow history
-Phase 7 — Notes and Audit
-Document notes
-Audit events
-Audit history
-User activity tracking
-Phase 8 — Search and Dashboard
+Phase 5 — Security
+Keycloak integration
+JWT validation
+Role-based access control
+Protected endpoints
+Classification-based access rules
+Phase 6 — Audit and Search
+Audit logging
 Document search
 Filtering
-Statistics
-Recent documents
-Dashboard views
-Phase 9 — React Frontend
-Authentication interface
+Sorting
+Pagination
+Phase 7 — Frontend
+React application
+Authentication flow
 Dashboard
 Department management
-Category management
 Document management
-Search
-Workflow screens
-Phase 10 — Deployment
+Search interface
+Workflow interface
+Phase 8 — Testing and Quality
+Unit tests
+Integration tests
+API testing
+Validation
+Error handling
+Phase 9 — Deployment
 Docker configuration
-Environment configuration
-Database deployment
-Backend deployment
-Frontend deployment
+PostgreSQL container
+Keycloak container
+Backend container
+Frontend container
 Deployment documentation
-27. Project Design Principles
-Database Consistency
+📌 Current Project Status
+Completed
+Spring Boot backend initialized
+PostgreSQL database connected
+PostgreSQL 18.4 configured
+Flyway configured
+Six database migrations validated
+Database schema reached version 6
+Hibernate/JPA configured
+Department module foundation created
+Department repository created
+Department DTO created
+Department mapper created
+Department service interface created
+Department service implementation created
+Department controller created
+Application successfully starts on port 8080
+Git repository initialized
+Main branch established
+Current Backend Status
+Application: Running
+Database: Connected
+Flyway: Healthy
+Schema: Version 6
+JPA: Initialized
+Tomcat: Running on port 8080
+🔒 Important Development Rule
 
-The backend must remain consistent with the established V1–V6 database design.
+The system is being developed according to the established V1–V6 database and architecture.
 
-The application should not introduce entities or relationships that contradict the database schema without deliberately updating the database through a new migration.
+Future development should:
 
-Modular Design
+Respect the existing schema.
+Avoid breaking previous working modules.
+Avoid unnecessary architectural changes.
+Introduce database changes through new Flyway migrations.
+Maintain consistency between:
+Database
+Entities
+DTOs
+Mappers
+Repositories
+Services
+Controllers
+Test the application after meaningful changes.
+Commit stable milestones to GitHub.
 
-Each major business domain is organized into its own module.
+The project should evolve deliberately rather than repeatedly restarting from scratch.
 
-department/
-category/
-document/
-workflow/
-audit/
-Separation of Responsibilities
 
-Each layer has a clear responsibility:
+📄 License
 
-Layer	Responsibility
-Controller	HTTP/API communication
-DTO	API data transfer
-Mapper	DTO/entity conversion
-Service	Business logic
-Repository	Database access
-Entity	Domain/database representation
-Scope Control
+This project is currently developed as an academic and professional portfolio project.
 
-The project intentionally avoids unnecessary technologies.
-
-The goal is not to use the largest possible technology stack.
-
-The goal is to build a complete, secure, maintainable archive system within the available development time.
-
-Git Discipline
-
-Every meaningful feature should be:
-
-Implemented
-    ↓
-Tested
-    ↓
-Committed
-    ↓
-Pushed
-28. Future Deployment
-
-The system is intended to support containerized deployment using Docker.
-
-The planned deployment architecture is:
-
-┌──────────────┐
-│   Frontend   │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│   Backend    │
-└──────┬───────┘
-       │
-       ├──────────────┐
-       ▼              ▼
-┌──────────────┐ ┌──────────────┐
-│ PostgreSQL   │ │  Keycloak    │
-└──────────────┘ └──────────────┘
-
-The deployment configuration will be added after the core application functionality has been completed.
-
-29. License
-
-This project is developed for educational and internship purposes.
+License details may be added as the project progresses.
