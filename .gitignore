@@ -34,3 +34,7 @@ build/
 
 # Application file storage
 archive-storage/
+
+# Ignore local secrets
+.env
+src/main/resources/application.properties
