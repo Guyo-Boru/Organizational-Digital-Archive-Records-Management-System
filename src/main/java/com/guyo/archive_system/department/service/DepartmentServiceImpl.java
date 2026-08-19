@@ -28,7 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentDto getById(UUID departmentId) {
 
         Department department = departmentRepository
-                .findById(departmentId)
+                .findByDepartmentIdAndDeletedAtIsNull(departmentId)
                 .orElseThrow(() ->
         new ResourceNotFoundException(
                 "Department not found: " + departmentId
@@ -42,7 +42,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public List<DepartmentDto> getAll() {
 
         return departmentRepository
-                .findAll()
+                .findByDeletedAtIsNull()
                 .stream()
                 .map(DepartmentMapper::toDto)
                 .toList();

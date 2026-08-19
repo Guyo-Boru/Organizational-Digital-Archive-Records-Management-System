@@ -9,6 +9,7 @@ import com.guyo.archive_system.category.dto.CategoryDto;
 import com.guyo.archive_system.category.entity.Category;
 import com.guyo.archive_system.category.mapper.CategoryMapper;
 import com.guyo.archive_system.category.repository.CategoryRepository;
+import com.guyo.archive_system.common.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,9 +23,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getById(UUID categoryId) {
 
-        Category category = categoryRepository.findById(categoryId)
+        Category category = categoryRepository.findByCategoryIdAndDeletedAtIsNull(categoryId)
                 .orElseThrow(() ->
-                        new RuntimeException("Category not found"));
+                        new ResourceNotFoundException("Category not found: " + categoryId));
 
         return categoryMapper.toDto(category);
     }
