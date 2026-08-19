@@ -14,8 +14,6 @@ import com.guyo.archive_system.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,31 +42,52 @@ public class Document {
     @Column(name = "document_id")
     private UUID documentId;
 
-    @Column(name = "reference_number", nullable = false, unique = true, length = 50)
+    @Column(
+        name = "reference_number",
+        nullable = false,
+        unique = true,
+        length = 50
+    )
     private String referenceNumber;
 
-    @Column(nullable = false, length = 300)
+    @Column(
+        name = "title",
+        nullable = false,
+        length = 300
+    )
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(
+        name = "category_id",
+        nullable = false
+    )
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", nullable = false)
+    @JoinColumn(
+        name = "department_id",
+        nullable = false
+    )
     private Department department;
 
-    @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "classification", nullable = false)
+    @Column(
+        name = "classification",
+        nullable = false,
+        columnDefinition = "classification_level"
+    )
     private ClassificationLevel classification;
 
-    @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", nullable = false)
+    @Column(
+        name = "status",
+        nullable = false,
+        columnDefinition = "document_status"
+    )
     private DocumentStatus status;
 
     @Column(name = "current_version_id")
@@ -76,14 +96,21 @@ public class Document {
     @Column(name = "archived_at")
     private OffsetDateTime archivedAt;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(
+        name = "created_at",
+        nullable = false,
+        updatable = false
+    )
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", nullable = false)
+    @JoinColumn(
+        name = "created_by",
+        nullable = false
+    )
     private User createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -96,4 +123,14 @@ public class Document {
     @Column(name = "deleted_by")
     private UUID deletedBy;
 
+    /**
+     * Optimistic-locking token. Without this, two concurrent updates (e.g.
+     * two reviewers changing workflow status at the same time) silently
+     * overwrite one another; with it, the second commit fails fast with an
+     * {@code ObjectOptimisticLockingFailureException} instead of quietly
+     * losing data.
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 }

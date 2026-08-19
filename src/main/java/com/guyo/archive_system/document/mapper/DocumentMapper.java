@@ -1,35 +1,85 @@
 package com.guyo.archive_system.document.mapper;
 
-import com.guyo.archive_system.document.dto.DocumentDto;
-import com.guyo.archive_system.document.entity.Document;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import com.guyo.archive_system.document.dto.DocumentDto;
+import com.guyo.archive_system.document.entity.Document;
 
 @Component
 public class DocumentMapper {
 
     public DocumentDto toDto(Document document) {
 
+        if (document == null) {
+            return null;
+        }
+
         return DocumentDto.builder()
-                .documentId(document.getDocumentId())
-                .referenceNumber(document.getReferenceNumber())
-                .title(document.getTitle())
-                .description(document.getDescription())
-                .categoryId(document.getCategory().getCategoryId())
-                .departmentId(document.getDepartment().getDepartmentId())
-                .classification(document.getClassification())
-                .status(document.getStatus())
-                .createdBy(document.getCreatedBy().getUserSub())
-                .createdAt(document.getCreatedAt())
+
+                .documentId(
+                    document.getDocumentId()
+                )
+
+                .referenceNumber(
+                    document.getReferenceNumber()
+                )
+
+                .title(
+                    document.getTitle()
+                )
+
+                .description(
+                    document.getDescription()
+                )
+
+                .categoryId(
+                    document.getCategory() != null
+                        ? document.getCategory().getCategoryId()
+                        : null
+                )
+
+                .departmentId(
+                    document.getDepartment() != null
+                        ? document.getDepartment().getDepartmentId()
+                        : null
+                )
+
+                .classification(
+                    document.getClassification()
+                )
+
+                .status(
+                    document.getStatus()
+                )
+
+                .currentVersionId(
+                    document.getCurrentVersionId()
+                )
+
+                .createdBy(
+                    document.getCreatedBy() != null
+                        ? document.getCreatedBy().getUserSub()
+                        : null
+                )
+
+                .updatedBy(
+                    document.getUpdatedBy() != null
+                        ? document.getUpdatedBy().getUserSub()
+                        : null
+                )
+
+                .createdAt(
+                    document.getCreatedAt()
+                )
+
+                .updatedAt(
+                    document.getUpdatedAt()
+                )
+
+                .archivedAt(
+                    document.getArchivedAt()
+                )
+
                 .build();
     }
-
-    public List<DocumentDto> toDtoList(List<Document> documents) {
-
-        return documents.stream()
-                .map(this::toDto)
-                .toList();
-    }
-
 }
