@@ -412,6 +412,17 @@ DEPARTMENT_USER
 
 The exact role model will be finalized according to the system's functional requirements.
 
+### Keycloak role mapping
+
+The API maps roles from both Keycloak realm roles (`realm_access.roles`) and
+client roles for the `archive-system` client (`resource_access.archive-system.roles`)
+to Spring Security authorities such as `ROLE_AUDITOR` and
+`ROLE_ARCHIVE_OFFICER`. OAuth scopes are retained as `SCOPE_*` authorities.
+
+Supported operational roles are `SUPER_ADMIN`, `ADMIN`, `ARCHIVE_OFFICER`,
+`RECORDS_MANAGER`, `DEPARTMENT_MANAGER`, `REVIEWER`, and `AUDITOR`. Assign
+these roles in Keycloak before testing protected workflow and audit endpoints.
+
 📄 Document Classification
 
 Documents may be assigned classification levels.

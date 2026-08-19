@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.guyo.archive_system.audit.dto.AuditLogDto;
 import com.guyo.archive_system.audit.service.AuditLogService;
@@ -21,6 +22,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping("/{resourceId}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'AUDITOR', 'ARCHIVE_OFFICER', 'RECORDS_MANAGER')")
     public List<AuditLogDto> getAuditLogs(
             @PathVariable UUID resourceId) {
 
