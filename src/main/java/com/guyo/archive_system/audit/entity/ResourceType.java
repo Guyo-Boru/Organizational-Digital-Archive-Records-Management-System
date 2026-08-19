@@ -4,6 +4,7 @@ public enum ResourceType {
 
     DOCUMENT,
     DOCUMENT_VERSION,
+    DOCUMENT_NOTE,
     CATEGORY,
     DEPARTMENT,
     USER

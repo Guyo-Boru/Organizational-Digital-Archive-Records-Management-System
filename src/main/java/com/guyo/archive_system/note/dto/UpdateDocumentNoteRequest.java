@@ -4,6 +4,7 @@ import com.guyo.archive_system.note.enums.NoteType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ public class UpdateDocumentNoteRequest {
     private NoteType noteType;
 
     @NotBlank
+    @Size(max = 4000, message = "note must be at most 4000 characters")
     private String note;
 
 }
